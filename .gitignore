@@ -1,0 +1,12 @@
+# Environment (rebuild with: python -m venv .venv && pip install -r requirements.txt)
+.venv/
+
+# Dataset and weights: too large for GitHub (vgg16.pth is 537 MB, the limit is 100 MB per file)
+data/
+checkpoints/
+*.pth
+
+# Python and macOS clutter
+__pycache__/
+*.pyc
+.DS_Store
