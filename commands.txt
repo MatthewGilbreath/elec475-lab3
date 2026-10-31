@@ -1,0 +1,40 @@
+# ELEC 475 Lab 3: terminal commands
+# Run every command from the lab3_template folder.
+# Requires data/oxford-iiit-pet-noses/ and checkpoints/{snoutnet,alexnet,vgg16}.pth
+
+# ---- Environment ----
+python -m venv .venv
+source .venv/bin/activate          
+pip install -r requirements.txt
+
+# ---- Pre-Lab ----
+python -m utils.dataset            # dataset sizes and one sample
+python -m utils.check_dataset      # checks every sample, saves plots/dataset_check.png
+python -m models.snoutnet          # model summaries, loads the provided weights, known prediction
+
+# ---- In-Lab ----
+python predict.py --model all      # saves predictions/{snoutnet,alexnet,vgg16}.pt
+python evaluate.py                 # accuracy/cost tables, plots/ced.png, plots/best_worst_*.png
+
+# ---- Post-Lab Step 1: correction dataset reality check ----
+python -m utils.correction_dataset # saves plots/correction_patches.png and plots/correction_patches_aug.png
+
+# ---- Post-Lab Step 2: correction model check ----
+python -m models.correction        # CorrectionNet (766,594 params) and CorrectionNetModified (1,108,642 params)
+
+# ---- Post-Lab Step 3: train CorrectionNet ----
+python train_correction.py --no-augment --save-model checkpoints/correction_noaug.pth --plot-file plots/loss_correction_noaug.png
+python train_correction.py --save-model checkpoints/correction_aug.pth --plot-file plots/loss_correction_aug.png
+
+# ---- Post-Lab Step 4: correct the test-set predictions ----
+python correct.py --checkpoint checkpoints/correction_noaug.pth
+python correct.py --checkpoint checkpoints/correction_aug.pth
+
+# ---- Post-Lab Step 5: train and apply CorrectionNetModified ----
+python train_correction.py --modified --no-augment --save-model checkpoints/correction_mod_noaug.pth --plot-file plots/loss_correction_mod_noaug.png
+python train_correction.py --modified --save-model checkpoints/correction_mod_aug.pth --plot-file plots/loss_correction_mod_aug.png
+python correct.py --modified --checkpoint checkpoints/correction_mod_noaug.pth
+python correct.py --modified --checkpoint checkpoints/correction_mod_aug.pth
+
+# ---- Final evaluation: all 18 rows, plots/ced.png, plots/best_worst_*.png ----
+python evaluate.py
